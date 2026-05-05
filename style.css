@@ -268,8 +268,9 @@ section { padding:80px 24px; }
   .hero { min-height:auto; padding:100px 24px 60px; }
   .foerderung-grid, .kontakt-grid { grid-template-columns:1fr; }
   .foerderung-visual .big-text { font-size:52px; }
-  .footer-inner { grid-template-columns:1fr; }
-  .footer-links, .footer-contact { display:none; }
+  .footer-inner { grid-template-columns:1fr; gap:24px; }
+  .footer-links { flex-direction:column; gap:10px; align-items:flex-start; }
+  .footer-links { display:flex; }
   .cards-grid { grid-template-columns:1fr; }
   .kontakt-actions { flex-direction:column; }
   .kontakt-action-btn { justify-content:center; }
