@@ -631,3 +631,27 @@ section { padding:80px 24px; }
     grid-template-rows: unset;
   }
 }
+
+/* ══ PRICE TABLE MOBILE ══ */
+@media (max-width: 600px) {
+  .price-table { border: none; }
+  .price-row.price-header { display: none; }
+  .price-row {
+    display: flex;
+    flex-direction: column;
+    background: var(--purple-pale);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+    border: none;
+    border-bottom: none;
+    gap: 4px;
+  }
+  .price-row.price-highlight { background: var(--purple-light); }
+  .price-row.price-highlight span { color: white; }
+  .price-row span:nth-child(1)::before { content: ''; }
+  .price-row span:nth-child(2)::before { content: 'Std./Woche: '; font-weight: 400; color: var(--text-light); font-size: 0.85rem; }
+  .price-row span:nth-child(3)::before { content: 'Preis: '; font-weight: 400; color: var(--text-light); font-size: 0.85rem; }
+  .price-row span:nth-child(4)::before { content: ''; }
+  .price-row span:nth-child(4) { display: block; font-size: 0.85rem; color: var(--text-light); }
+}
