@@ -590,3 +590,21 @@ section { padding:80px 24px; }
 @media (max-width: 768px) {
   .but-router-grid { grid-template-columns: 1fr; }
 }
+
+/* ══ KONTAKT GRID ══ */
+.kontakt-grid-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-top: 40px;
+  align-items: start;
+}
+.kontakt-left h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+@media (max-width: 768px) {
+  .kontakt-grid-main { grid-template-columns: 1fr; gap: 32px; }
+}

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Preise für Nachhilfe bei MJ Lernförderung Hannover – transparent und fair."/>
-  <title>Preise – MJ Lernförderung</title>
+  <meta name="description" content="Preise & Anmeldung bei MJ Lernförderung Hannover – transparent, fair, unverbindlich."/>
+  <title>Preise & Anmeldung – MJ Lernförderung</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../style.css"/>
@@ -13,7 +13,7 @@
 <div id="header-mount"></div>
 <section class="page-hero">
   <div class="section-inner">
-    <div class="section-label">Preise</div>
+    <div class="section-label">Preise & Anmeldung</div>
     <h1>Transparent und fair.</h1>
     <p class="section-sub">Bei MJ Lernförderung gibt es keine versteckten Kosten. Sie entscheiden, welches Modell zu Ihrer Familie passt. Eine langfristige Bindung gibt es bei uns nicht.</p>
   </div>
@@ -52,14 +52,86 @@
       <li>Zahlung per Überweisung oder SEPA-Lastschrift</li>
       <li>Keine langfristige Bindung</li>
       <li>Kündigungsfrist 4 Wochen zum Monatsende, schriftlich</li>
+      <li>Absagen bis 48 Stunden vorher — im Krankheitsfall bis 10 Uhr am Unterrichtstag</li>
     </ul>
 
     <h2 class="section-title" style="margin-top:48px">Förderung über Bildung und Teilhabe</h2>
     <p>Wenn eine Kostenübernahme über Bildung und Teilhabe bewilligt ist, rechnen wir direkt mit dem zuständigen Amt ab. Für Ihre Familie entstehen dann im Rahmen der Bewilligung keine privaten Unterrichtskosten.</p>
 
-    <div class="cta-block">
-      <a href="https://wa.me/4915256352575" class="cta-btn large" target="_blank">Jetzt unverbindlich anfragen</a>
+    <h2 class="section-title" style="margin-top:48px">Anmeldung</h2>
+    <p style="color:var(--text-mid);margin-bottom:24px">Bereit loszulegen? Laden Sie das Anmeldeformular herunter, füllen Sie es aus und schicken Sie es uns zurück — oder melden Sie sich direkt bei uns.</p>
+
+    <div class="but-router-grid">
+
+      <div class="but-router-card">
+        <div class="but-router-icon">📥</div>
+        <h3>Anmeldeformular herunterladen</h3>
+        <p>Laden Sie den Unterrichtsvertrag herunter, füllen Sie ihn aus und schicken Sie ihn ausgefüllt zurück.</p>
+        <div class="download-list" style="margin-top:16px">
+          <a href="https://raw.githubusercontent.com/sumy68/mj-lernfoerderung/main/downloads/Anmeldeformular_MJ_Lernfoerderung.pdf" class="download-item" target="_blank">📄 Anmeldeformular / Unterrichtsvertrag (PDF)</a>
+        </div>
+      </div>
+
+      <div class="but-router-card highlight">
+        <div class="but-router-icon">📤</div>
+        <h3>Ausgefülltes Formular einreichen</h3>
+        <p>Formular bereits ausgefüllt? Laden Sie es direkt hier hoch — wir melden uns schnellstmöglich.</p>
+        <form id="anmeldung-upload-form" style="margin-top:16px">
+          <div class="form-group">
+            <label>Ihr Name</label>
+            <input type="text" id="anmeldung-name" placeholder="Vor- und Nachname" required/>
+          </div>
+          <div class="form-group" style="margin-top:12px">
+            <label>Telefon oder E-Mail</label>
+            <input type="text" id="anmeldung-kontakt" placeholder="Damit wir Sie erreichen können" required/>
+          </div>
+          <div class="form-group" style="margin-top:12px">
+            <label>Ausgefülltes Formular (PDF oder Foto)</label>
+            <input type="file" id="anmeldung-file" accept=".pdf,image/*" required style="padding:10px;border:2px solid var(--lavender);border-radius:10px;width:100%;background:var(--purple-pale);font-family:'Nunito',sans-serif"/>
+          </div>
+          <button type="submit" class="cta-btn large" style="width:100%;justify-content:center;margin-top:16px">Formular einreichen</button>
+          <p id="anmeldung-success" style="display:none;color:#25D366;font-weight:700;text-align:center;margin-top:12px">✅ Erfolgreich eingereicht! Wir melden uns bald.</p>
+          <p id="anmeldung-error" style="display:none;color:#e53e3e;font-weight:700;text-align:center;margin-top:12px">❌ Fehler beim Senden. Bitte WhatsApp nutzen.</p>
+        </form>
+      </div>
+
     </div>
+
+    <div class="cta-block" style="margin-top:40px">
+      <a href="https://wa.me/4915256352575" class="cta-btn large" target="_blank">Lieber direkt anfragen</a>
+    </div>
+
+    <script>
+    document.getElementById('anmeldung-upload-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('button[type="submit"]');
+      btn.textContent = 'Wird gesendet...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('name', document.getElementById('anmeldung-name').value);
+      formData.append('telefon', document.getElementById('anmeldung-kontakt').value);
+      formData.append('leistungsart', 'Anmeldeformular');
+      formData.append('formular', document.getElementById('anmeldung-file').files[0]);
+
+      try {
+        const res = await fetch('https://plattform-mj.onrender.com/api/but-public-upload', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          document.getElementById('anmeldung-success').style.display = 'block';
+          this.reset();
+        } else {
+          document.getElementById('anmeldung-error').style.display = 'block';
+        }
+      } catch(err) {
+        document.getElementById('anmeldung-error').style.display = 'block';
+      }
+      btn.textContent = 'Formular einreichen';
+      btn.disabled = false;
+    });
+    </script>
   </div>
 </section>
 <div id="footer-mount"></div>
