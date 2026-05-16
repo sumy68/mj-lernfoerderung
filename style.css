@@ -430,3 +430,81 @@ section { padding:80px 24px; }
   .cta-block { flex-direction: column; }
   .page-hero { padding: 60px 16px 40px; }
 }
+
+/* ══ MEHR ALS LERNFÖRDERUNG ══ */
+.mehr-als-section {
+  background: #3b2568;
+  padding: 80px 24px;
+}
+.mehr-als-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.mehr-als-col {
+  padding: 48px 56px;
+}
+.mehr-als-col.left {
+  border-right: 1px solid rgba(255,255,255,0.12);
+}
+.mehr-als-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.12);
+  color: #d4b8ff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+.mehr-als-col h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.15;
+  margin: 0 0 16px;
+}
+.mehr-als-col p {
+  color: rgba(255,255,255,0.78);
+  font-size: 1rem;
+  line-height: 1.75;
+  margin: 0 0 28px;
+}
+.mehr-als-icons-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.mehr-als-icons-row span {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.88rem;
+}
+.mehr-als-btn {
+  display: inline-block;
+  background: #fff;
+  color: #3b2568;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 14px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+.mehr-als-btn:hover {
+  background: #d4b8ff;
+  color: #3b2568;
+}
+@media (max-width: 768px) {
+  .mehr-als-inner { grid-template-columns: 1fr; }
+  .mehr-als-col { padding: 40px 24px; }
+  .mehr-als-col.left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.12); }
+  .mehr-als-col h2 { font-size: 1.8rem; }
+}
