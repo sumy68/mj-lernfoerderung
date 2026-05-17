@@ -662,3 +662,14 @@ section { padding:80px 24px; }
   .price-row span:nth-child(4)::before { content: ''; }
   .price-row span:nth-child(4) { display: block; font-size: 0.85rem; color: var(--text-light); }
 }
+
+/* ══ BuT SEITE: Text zentriert ══ */
+.but-page .section-inner {
+  text-align: center;
+}
+.but-page .steps-list,
+.but-page .mj-list,
+.but-page .but-router-grid,
+.but-page .cta-block {
+  text-align: left;
+}
