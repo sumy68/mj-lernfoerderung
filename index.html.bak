@@ -163,7 +163,7 @@
             </div>
           </div>
         </div>
-        <a href="/pages/but/" class="cta-btn large" style="display:inline-flex;margin-top:32px;">Mehr zur BuT-Förderung</a>
+        <a href="pages/but.html" class="cta-btn large" style="display:inline-flex;margin-top:32px;">Mehr zur BuT-Förderung</a>
       </div>
     </div>
   </div>
@@ -336,7 +336,7 @@
 <!-- ══ COOKIE BANNER ══ -->
 <div class="cookie-banner" id="cookie-banner">
   <div class="cookie-inner">
-    <p>🍪 Diese Website verwendet technisch notwendige Cookies. Weitere Informationen finden Sie in unserer <a href="/datenschutz/">Datenschutzerklärung</a>.</p>
+    <p>🍪 Diese Website verwendet technisch notwendige Cookies. Weitere Informationen finden Sie in unserer <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
     <button class="cookie-accept" id="cookie-accept">Verstanden</button>
   </div>
 </div>

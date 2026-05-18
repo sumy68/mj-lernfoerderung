@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Bildung und Teilhabe (BuT) – kostenlose Nachhilfe in Hannover. MJ Lernförderung hilft beim Antrag."/>
+  <title>Bildung und Teilhabe – MJ Lernförderung</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../style.css"/>
+</head>
+<body class="but-page">
+<div id="header-mount"></div>
+<section class="page-hero">
+  <div class="section-inner">
+    <div class="section-label">Bildung und Teilhabe</div>
+    <h1>Nachhilfe kann kostenlos sein.</h1>
+    <p class="section-sub">Viele Familien wissen nicht, dass sie Anspruch auf kostenfreie Nachhilfe haben. Über das Bildungs- und Teilhabepaket können die Kosten für Lernförderung übernommen werden, wenn schulische Lernziele gefährdet sind und die Schule einen Förderbedarf bestätigt.</p>
+  </div>
+</section>
+<section>
+  <div class="section-inner">
+    <p>Von der Feststellung des Lernförderbedarfs bis zum Bildungsgutschein begleiten wir Sie zuverlässig durch den gesamten Antragsprozess. Wir unterstützen Sie bei der Antragstellung, übernehmen den Kontakt mit den Behörden und versenden die Unterlagen für Sie – damit der Nachhilfeunterricht ohne Verzögerung direkt starten kann. Für Ihre Familie entstehen keine Kosten.</p>
+
+    <h2 class="section-title" style="margin-top:48px">Wer hat Anspruch?</h2>
+    <p>Anspruch auf BuT-Leistungen haben Familien, die unter anderem folgende Leistungen beziehen:</p>
+    <ul class="mj-list">
+      <li>Bürgergeld (ALG II)</li>
+      <li>Sozialhilfe</li>
+      <li>Wohngeld</li>
+      <li>Kinderzuschlag</li>
+      <li>Leistungen nach dem Asylbewerberleistungsgesetz</li>
+    </ul>
+
+    <h2 class="section-title" style="margin-top:48px">So läuft der Antrag</h2>
+    <div class="steps-list">
+      <div class="step">
+        <div class="step-nr">1</div>
+        <div>
+          <strong>Anspruch klären</strong>
+          <p>Im kostenlosen Erstgespräch prüfen wir gemeinsam, ob ein Anspruch besteht und welche Unterlagen Sie benötigen.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-nr">2</div>
+        <div>
+          <strong>Schulische Bestätigung einholen</strong>
+          <p>Die Schule bestätigt den Lernförderbedarf auf einem dafür vorgesehenen Formular.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-nr">3</div>
+        <div>
+          <strong>Antrag stellen</strong>
+          <p>Wir helfen beim Ausfüllen und beim Einreichen des Antrags bei der zuständigen Stelle in der Stadt oder Region Hannover. Bei sprachlichen Hürden unterstützen wir.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-nr">4</div>
+        <div>
+          <strong>Förderung starten</strong>
+          <p>Nach Antragsstellung beginnt die Lernförderung. Die Abrechnung läuft direkt mit dem Amt.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title" style="margin-top:48px">Anträge & Unterlagen</h2>
+    <p style="color:var(--text-mid);margin-bottom:24px">Laden Sie das passende Formular herunter, füllen Sie es aus und laden Sie es direkt hier hoch — oder kontaktieren Sie uns, wir helfen Ihnen dabei.</p>
+
+    <div class="but-router-grid">
+
+      <div class="but-router-card">
+        <div class="but-router-icon">📥</div>
+        <h3>Formular herunterladen</h3>
+        <p>Laden Sie das passende Formular herunter und lassen Sie es von der Schule ausfüllen.</p>
+        <div class="download-list" style="margin-top:16px">
+          <a href="../downloads/BuT_Formular_Jobcenter_Hannover.pdf" class="download-item" download>📄 Jobcenter Hannover (Bürgergeld)</a>
+          <a href="../downloads/BuT_Formular_Region_Hannover.pdf" class="download-item" download>📄 Region Hannover (Wohngeld / Kinderzuschlag)</a>
+        </div>
+      </div>
+
+      <div class="but-router-card highlight">
+        <div class="but-router-icon">📤</div>
+        <h3>Ausgefülltes Formular einreichen</h3>
+        <p>Formular bereits ausgefüllt? Laden Sie es hier direkt hoch — wir kümmern uns um den Rest.</p>
+        <form id="but-upload-form" style="margin-top:16px">
+          <div class="form-group">
+            <label>Ihr Name</label>
+            <input type="text" id="but-name" placeholder="Vor- und Nachname" required/>
+          </div>
+          <div class="form-group" style="margin-top:12px">
+            <label>Telefon oder E-Mail</label>
+            <input type="text" id="but-telefon" placeholder="Damit wir Sie erreichen können" required/>
+          </div>
+          <div class="form-group" style="margin-top:12px">
+            <label>Leistungsart</label>
+            <select id="but-leistungsart" style="padding:12px 16px;border:2px solid var(--lavender);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;color:var(--text-dark);background:var(--purple-pale);width:100%">
+              <option value="">Bitte wählen...</option>
+              <option>Bürgergeld (Jobcenter)</option>
+              <option>Wohngeld</option>
+              <option>Kinderzuschlag</option>
+              <option>Sozialhilfe</option>
+              <option>Asylbewerberleistungen</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-top:12px">
+            <label>Ausgefülltes Formular (PDF oder Foto)</label>
+            <input type="file" id="but-file" accept=".pdf,image/*" required style="padding:10px;border:2px solid var(--lavender);border-radius:10px;width:100%;background:var(--purple-pale);font-family:'Nunito',sans-serif"/>
+          </div>
+          <button type="submit" class="cta-btn large" style="width:100%;justify-content:center;margin-top:16px">
+            Formular einreichen
+          </button>
+          <p id="but-success" style="display:none;color:#25D366;font-weight:700;text-align:center;margin-top:12px">✅ Erfolgreich eingereicht! Wir melden uns bald.</p>
+          <p id="but-error" style="display:none;color:#e53e3e;font-weight:700;text-align:center;margin-top:12px">❌ Fehler beim Senden. Bitte WhatsApp nutzen.</p>
+        </form>
+      </div>
+
+    </div>
+
+    <div class="cta-block">
+      <a href="https://wa.me/4915256352575" class="cta-btn large" target="_blank">Lieber persönlich anfragen</a>
+    </div>
+
+    <script>
+    document.getElementById('but-upload-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('button[type="submit"]');
+      btn.textContent = 'Wird gesendet...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('name', document.getElementById('but-name').value);
+      formData.append('telefon', document.getElementById('but-telefon').value);
+      formData.append('leistungsart', document.getElementById('but-leistungsart').value);
+      formData.append('formular', document.getElementById('but-file').files[0]);
+
+      try {
+        const res = await fetch('https://plattform-mj.onrender.com/api/but-public-upload', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          document.getElementById('but-success').style.display = 'block';
+          this.reset();
+        } else {
+          document.getElementById('but-error').style.display = 'block';
+        }
+      } catch(err) {
+        document.getElementById('but-error').style.display = 'block';
+      }
+      btn.textContent = 'Formular einreichen';
+      btn.disabled = false;
+    });
+    </script>
+  </div>
+</section>
+<div id="footer-mount"></div>
+<script src="../main.js"></script>
+</body>
+</html>
