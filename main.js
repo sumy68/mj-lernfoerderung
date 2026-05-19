@@ -2,7 +2,8 @@ async function loadPartial(id, file) {
   const el = document.getElementById(id);
   if (!el) return;
   try {
-    const base = window.location.pathname.includes('/pages/') ? '../../' : '';
+    const depth = (window.location.pathname.match(/\//g) || []).length - 1;
+    const base = depth > 0 ? '../'.repeat(depth) : '';
     const res = await fetch(base + 'partials/' + file);
     if (!res.ok) throw new Error('not found');
     el.innerHTML = await res.text();
