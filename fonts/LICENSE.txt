@@ -1,0 +1,31 @@
+Schriftarten dieser Website (Self-Hosting)
+==========================================
+
+Beide Familien stehen unter der SIL Open Font License, Version 1.1.
+Das Self-Hosting auf der eigenen Domain ist damit ausdrücklich erlaubt.
+
+Cormorant Garamond
+  Copyright 2015 the Cormorant Project Authors
+  https://github.com/CatharsisFonts/Cormorant
+  Lizenztext: siehe cormorant-OFL.txt
+  Dateien: cormorant-garamond.woff2 (latin), cormorant-garamond-ext.woff2 (latin-ext)
+
+Nunito
+  Copyright 2014 The Nunito Project Authors
+  https://github.com/googlefonts/nunito
+  Lizenztext: siehe nunito-OFL.txt
+  Dateien: nunito.woff2 (latin), nunito-ext.woff2 (latin-ext)
+
+Hinweise
+--------
+Beide Schriften sind Variable Fonts: eine Datei deckt den Gewichtsbereich ab,
+der in style.css als "font-weight: 400 700" deklariert ist. Genutzt werden die
+Gewichte 400 (Fließtext), 600 (Navigation, Labels) und 700 (Überschriften).
+
+Die "-ext"-Dateien enthalten den Zeichensatz Latin-Extended. Sie werden dank
+der unicode-range-Angabe in style.css nur dann geladen, wenn auf einer Seite
+tatsächlich ein entsprechendes Zeichen vorkommt.
+
+Bezugsquelle der Dateien: Google Fonts (fonts.gstatic.com), einmalig
+heruntergeladen am 05.08.2026. Zur Laufzeit wird keine Verbindung zu Google
+hergestellt.
