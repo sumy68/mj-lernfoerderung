@@ -18,18 +18,8 @@ async function init() {
     loadPartial('footer-mount', 'footer.html'),
   ]);
 
-  // Cookie Banner
-  const banner = document.getElementById('cookie-banner');
-  const acceptBtn = document.getElementById('cookie-accept');
-  if (banner && !localStorage.getItem('cookie-accepted')) {
-    banner.classList.add('show');
-  }
-  if (acceptBtn) {
-    acceptBtn.addEventListener('click', function () {
-      localStorage.setItem('cookie-accepted', 'true');
-      banner.classList.remove('show');
-    });
-  }
+  // Cookie Banner: wird von /js/tracking.js erzeugt und verwaltet
+  // (inkl. Google Consent Mode v2). Hier bewusst keine Logik mehr.
 
   // Burger menu — muss NACH dem Laden der Partials initialisiert werden
   const burger = document.getElementById('burger');
