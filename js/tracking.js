@@ -4,7 +4,10 @@
  * Zweck:
  *   1. Google-Tag (gtag.js) laden – DSGVO-konform mit Consent Mode v2.
  *   2. Consent-Banner (Opt-in) für Marketing-Cookies anzeigen und verwalten.
- *   3. Jeden Klick auf einen tel:-Link als Google-Ads-Conversion melden.
+ *   3. Jede Anfrage als Google-Ads-Conversion melden:
+ *        • Klick auf einen tel:-Link          → Conversion "Anruf-Klick"
+ *        • Klick auf einen WhatsApp-Button    → Conversion "WhatsApp-Anfrage"
+ *        • Absenden des Kontaktformulars      → Conversion "Formular-Anfrage"
  *
  * Einbindung: EIN Script-Tag im <head> jeder Seite:
  *   <script src="/js/tracking.js" defer></script>
@@ -29,6 +32,15 @@
   /** Conversion-Aktion "Anruf-Klick" (aus dem Google-Ads-Konto – nicht ändern). */
   var CALL_CONVERSION_SEND_TO = 'AW-18245035082/6IkDCIz2ltwcEMrI9PtD';
 
+  /** Conversion-Aktion "WhatsApp-Anfrage" (Kategorie Kontakt – nicht ändern). */
+  var WHATSAPP_CONVERSION_SEND_TO = 'AW-18245035082/r913CNCXwuYcEMrI9PtD';
+
+  /** Conversion-Aktion "Formular-Anfrage" (Kategorie Lead-Formular – nicht ändern). */
+  var FORM_CONVERSION_SEND_TO = 'AW-18245035082/tjZhCNOXwuYcEMrI9PtD';
+
+  /** Selektor des Kontaktformulars. */
+  var FORM_SELECTOR = '#kontakt-form';
+
   /** URL der gtag.js-Bibliothek. */
   var GTAG_SRC = 'https://www.googletagmanager.com/gtag/js?id=' + ADS_ID;
 
@@ -37,6 +49,13 @@
 
   /** Sperrzeit pro Telefonnummer, um Doppelzählung bei Mehrfachklick zu verhindern. */
   var CLICK_GUARD_MS = 1000;
+
+  /**
+   * Sperrzeit pro Anfrage-Kanal (Standard: 30 Minuten, gilt pro Browser-Tab).
+   * Verhindert, dass ein Besucher, der nacheinander mehrere WhatsApp-Buttons
+   * antippt, in Google Ads als mehrere Anfragen gezählt wird.
+   */
+  var LEAD_GUARD_MS = 30 * 60 * 1000;
 
   /** Link zur Datenschutzerklärung im Consent-Banner. */
   var PRIVACY_URL = '/datenschutz/';
@@ -285,7 +304,7 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
-   * 4) CONVERSION-TRACKING FÜR TELEFON-KLICKS
+   * 4) CONVERSION-TRACKING FÜR ANFRAGEN (Anruf, WhatsApp, Formular)
    * ═══════════════════════════════════════════════════════════════════════ */
 
   /**
@@ -317,51 +336,152 @@
   }
 
   /**
-   * Meldet den Anruf-Klick als Conversion an Google Ads.
+   * Sperrzeit pro Anfrage-Kanal. Nutzt sessionStorage, damit die Zählung auch
+   * über einen Seitenwechsel hinweg greift; fällt bei blockiertem Speicher
+   * (Private Mode) auf einen In-Memory-Speicher zurück.
+   * @param {string} channel 'whatsapp' | 'formular'
+   * @returns {boolean} true = darf gefeuert werden.
    */
-  function fireCallConversion() {
-    gtag('event', 'conversion', { 'send_to': CALL_CONVERSION_SEND_TO });
-    if (DEBUG) console.log('MJ call conversion fired');
+  var leadGuardMemory = {};
+
+  function passesLeadGuard(channel) {
+    var storageKey = 'mj-conv-' + channel;
+    var now = Date.now();
+    var previous;
+
+    try {
+      previous = parseInt(window.sessionStorage.getItem(storageKey), 10);
+    } catch (e) {
+      previous = leadGuardMemory[storageKey];
+    }
+
+    if (previous && now - previous < LEAD_GUARD_MS) return false;
+
+    try {
+      window.sessionStorage.setItem(storageKey, String(now));
+    } catch (e) {
+      leadGuardMemory[storageKey] = now;
+    }
+    return true;
+  }
+
+  /** Noch nicht eingetragene Labels dürfen nichts senden. */
+  function isConfigured(sendTo) {
+    return typeof sendTo === 'string' && sendTo.indexOf('HIER_LABEL') === -1;
   }
 
   /**
+   * Meldet eine Conversion an Google Ads.
+   * @param {string} sendTo  send_to-Wert der Conversion-Aktion
+   * @param {string} channel Kanalname für Log und Sperrzeit
+   */
+  function fireConversion(sendTo, channel) {
+    if (!isConfigured(sendTo)) {
+      log(channel, '– Label noch nicht eingetragen, nichts gesendet');
+      return;
+    }
+    gtag('event', 'conversion', { 'send_to': sendTo });
+    log(channel, '– Conversion gesendet');
+  }
+
+  /** Erkennt WhatsApp-Links (wa.me, api./web.whatsapp.com, whatsapp://). */
+  var WHATSAPP_PATTERN = /wa\.me\/|whatsapp\.com\/(?:send|message)|^whatsapp:/i;
+
+  /**
    * Ein einziger delegierter Listener auf document – erfasst dadurch auch
-   * tel:-Links, die erst später ins DOM kommen (z.B. Header-/Footer-Partials).
-   * Es wird bewusst KEIN preventDefault() aufgerufen, damit der Anruf startet.
+   * Links, die erst später ins DOM kommen (z.B. Header-/Footer-Partials).
+   * Es wird bewusst KEIN preventDefault() aufgerufen, damit Anruf bzw.
+   * WhatsApp normal starten.
    */
   function handleDocumentClick(event) {
     var target = event.target;
     if (!target || typeof target.closest !== 'function') return;
 
-    var link = target.closest('a[href^="tel:"]');
+    var link = target.closest('a[href]');
     if (!link) return;
 
     var href = link.getAttribute('href') || '';
+    var isCall = href.indexOf('tel:') === 0;
+    var isWhatsApp = WHATSAPP_PATTERN.test(href);
+    if (!isCall && !isWhatsApp) return;
 
     if (!hasMarketingConsent()) {
       log('Klick auf', href, '– keine Conversion (keine Einwilligung)');
       return;
     }
-    if (!passesClickGuard(href)) {
-      log('Klick auf', href, '– unterdrückt (Sperrzeit', CLICK_GUARD_MS + 'ms)');
+
+    if (isCall) {
+      if (!passesClickGuard(href)) {
+        log('Klick auf', href, '– unterdrückt (Sperrzeit', CLICK_GUARD_MS + 'ms)');
+        return;
+      }
+      fireConversion(CALL_CONVERSION_SEND_TO, 'anruf');
       return;
     }
 
-    fireCallConversion();
+    if (!passesLeadGuard('whatsapp')) {
+      log('Klick auf', href, '– unterdrückt (Sperrzeit', LEAD_GUARD_MS + 'ms)');
+      return;
+    }
+    fireConversion(WHATSAPP_CONVERSION_SEND_TO, 'whatsapp');
   }
 
   // capture: true → wird auch dann ausgelöst, wenn ein anderer Handler
   // die Weitergabe des Events stoppt.
   document.addEventListener('click', handleDocumentClick, true);
 
+  /**
+   * Meldet eine Formular-Anfrage. Wird von main.js aufgerufen, sobald
+   * Formspree eine erfolgreiche Antwort geliefert hat:
+   *
+   *     window.mjTracking.formLead();
+   *
+   * Zusätzlich hängt sich unten ein Fallback an das submit-Event, falls
+   * main.js den Aufruf (noch) nicht enthält. Die Sperrzeit verhindert, dass
+   * beide Wege zusammen doppelt zählen.
+   */
+  function formLead() {
+    if (!hasMarketingConsent()) {
+      log('Formular – keine Conversion (keine Einwilligung)');
+      return;
+    }
+    if (!passesLeadGuard('formular')) {
+      log('Formular – unterdrückt (Sperrzeit)');
+      return;
+    }
+    fireConversion(FORM_CONVERSION_SEND_TO, 'formular');
+  }
+
+  var formObserver = null;
+
+  function bindForm() {
+    var form = document.querySelector(FORM_SELECTOR);
+    if (!form || form.getAttribute('data-mj-conv-bound') === '1') return;
+    form.setAttribute('data-mj-conv-bound', '1');
+    form.addEventListener('submit', formLead);
+    if (formObserver) formObserver.disconnect();
+    log('Formular gebunden:', FORM_SELECTOR);
+  }
+
+  // Das Formular kann – wie Header und Footer – per Partial nachgeladen werden.
+  if (typeof MutationObserver === 'function') {
+    formObserver = new MutationObserver(bindForm);
+    formObserver.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
   /* ═══════════════════════════════════════════════════════════════════════
    * INITIALISIERUNG + ÖFFENTLICHE API
    * ═══════════════════════════════════════════════════════════════════════ */
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderBanner);
-  } else {
+  function init() {
     renderBanner();
+    bindForm();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 
   window.grantMarketingConsent = grantMarketingConsent;
@@ -370,7 +490,15 @@
     grantMarketingConsent: grantMarketingConsent,
     denyMarketingConsent: denyMarketingConsent,
     hasMarketingConsent: hasMarketingConsent,
-    showConsentBanner: showConsentBanner
+    showConsentBanner: showConsentBanner,
+    formLead: formLead,
+    /** Sperrzeiten zurücksetzen – nur zum Testen. */
+    resetLeadGuards: function () {
+      ['whatsapp', 'formular'].forEach(function (channel) {
+        try { window.sessionStorage.removeItem('mj-conv-' + channel); } catch (e) {}
+        delete leadGuardMemory['mj-conv-' + channel];
+      });
+    }
   };
 
   log('initialisiert – Consent:', storedConsent === null ? 'offen' : storedConsent);

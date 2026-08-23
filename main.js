@@ -53,6 +53,10 @@ async function init() {
           headers: { 'Accept': 'application/json' }
         });
         if (res.ok) {
+          // Google-Ads-Conversion erst nach erfolgreichem Versand melden.
+          if (window.mjTracking && window.mjTracking.formLead) {
+            window.mjTracking.formLead();
+          }
           form.reset();
           if (success) success.style.display = 'block';
           btn.style.display = 'none';
