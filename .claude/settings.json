@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat CNAME)",
+      "Bash(cat robots.txt)",
+      "Bash(ls sitemap*)",
+      "Bash(cd \"/Users/sumeyyeabur/Desktop/SMY KUNDEN/website/mj-lernfoerderung\" && rm -rf .img-originals && echo \"removed .img-originals \\(originals remain in git history\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(sed -n '/<title>/,/twitter:image/p' pages/preise/index.html)",
+      "WebFetch(domain:mj-lernfoerderung.de)"
+    ],
+    "additionalDirectories": [
+      "/Users/sumeyyeabur/Desktop/SMY KUNDEN/website/mj-lernfoerderung/.img-originals",
+      "/Users/sumeyyeabur/.claude/commands"
+    ]
+  }
+}
