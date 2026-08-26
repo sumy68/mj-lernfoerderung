@@ -452,13 +452,70 @@
     fireConversion(FORM_CONVERSION_SEND_TO, 'formular');
   }
 
+  /**
+   * Wartezeit, nach der das Formular auch ohne Rückmeldung von Google
+   * abgeschickt wird. Lieber eine verlorene Conversion als eine verlorene
+   * Anfrage.
+   */
+  var SUBMIT_FALLBACK_MS = 1200;
+
+  /**
+   * submit-Handler mit Absende-Garantie.
+   *
+   * Das Formular postet klassisch an Formspree, der Browser navigiert also
+   * sofort weg. Ein einfach abgefeuertes gtag-Event wird dabei abgebrochen und
+   * erreicht Google nie – genau deshalb blieb die Conversion-Aktion
+   * „Formular-Anfrage" ohne Daten.
+   *
+   * Ablauf hier: Absenden kurz anhalten, Conversion mit event_callback senden,
+   * und weitermachen, sobald Google bestätigt – spätestens nach
+   * SUBMIT_FALLBACK_MS. Das Absenden selbst wird nie blockiert.
+   */
+  function handleFormSubmit(event) {
+    var form = event.currentTarget;
+    if (!form || form.getAttribute('data-mj-submitting') === '1') return;
+
+    // Ohne Einwilligung, in der Sperrzeit oder ohne Label: normal absenden.
+    if (!hasMarketingConsent()) {
+      log('Formular – abgesendet ohne Conversion (keine Einwilligung)');
+      return;
+    }
+    if (!isConfigured(FORM_CONVERSION_SEND_TO)) {
+      log('Formular – abgesendet ohne Conversion (Label fehlt)');
+      return;
+    }
+    if (!passesLeadGuard('formular')) {
+      log('Formular – abgesendet ohne Conversion (Sperrzeit)');
+      return;
+    }
+
+    event.preventDefault();
+    form.setAttribute('data-mj-submitting', '1');
+
+    var proceeded = false;
+    function proceed() {
+      if (proceeded) return;
+      proceeded = true;
+      log('Formular – Absenden fortgesetzt');
+      // form.submit() löst kein erneutes submit-Event aus – keine Schleife.
+      form.submit();
+    }
+
+    window.setTimeout(proceed, SUBMIT_FALLBACK_MS);
+    gtag('event', 'conversion', {
+      'send_to': FORM_CONVERSION_SEND_TO,
+      'event_callback': proceed
+    });
+    log('formular – Conversion gesendet (mit Absende-Garantie)');
+  }
+
   var formObserver = null;
 
   function bindForm() {
     var form = document.querySelector(FORM_SELECTOR);
     if (!form || form.getAttribute('data-mj-conv-bound') === '1') return;
     form.setAttribute('data-mj-conv-bound', '1');
-    form.addEventListener('submit', formLead);
+    form.addEventListener('submit', handleFormSubmit);
     if (formObserver) formObserver.disconnect();
     log('Formular gebunden:', FORM_SELECTOR);
   }
