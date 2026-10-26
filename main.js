@@ -71,6 +71,8 @@ async function init() {
     });
   }
 
+  initMapConsent();
+
   // Scroll reveal
   const observer = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
@@ -84,6 +86,18 @@ async function init() {
   document.querySelectorAll('.card, .step, .kontakt-item, .foerderung-visual').forEach(function (el) {
     el.classList.add('reveal');
     observer.observe(el);
+  });
+}
+
+// Google Maps erst nach Klick einbinden (2-Klick-Lösung, kein Request vorab).
+function initMapConsent() {
+  const btn = document.getElementById('map-load-btn');
+  const container = document.getElementById('map-container');
+  const template = document.getElementById('map-template');
+  if (!btn || !container || !template) return;
+
+  btn.addEventListener('click', function () {
+    container.replaceChildren(template.content.cloneNode(true));
   });
 }
 

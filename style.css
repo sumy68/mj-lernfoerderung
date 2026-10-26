@@ -205,11 +205,12 @@ section { padding:80px 24px; }
 .cookie-inner p { font-size:14px; color:rgba(255,255,255,0.8); line-height:1.5; flex:1; }
 .cookie-inner a { color:var(--purple-light); }
 .cookie-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-.cookie-accept { padding:10px 24px; background:var(--purple); color:white; border:none; border-radius:50px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; transition:background 0.2s; font-family:var(--font-body); }
-.cookie-accept:hover { background:var(--purple-dark); }
-.cookie-decline { padding:10px 24px; background:transparent; color:rgba(255,255,255,0.85); border:1px solid rgba(255,255,255,0.35); border-radius:50px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; transition:background 0.2s,color 0.2s; font-family:var(--font-body); }
-.cookie-decline:hover { background:rgba(255,255,255,0.12); color:white; }
-@media (max-width:600px) { .cookie-actions { width:100%; } .cookie-actions button { flex:1; } }
+/* "Nur notwendige" und "Alle akzeptieren" sind bewusst identisch gestaltet
+   (gleiche Größe, Farbe, Gewichtung) – keine Bevorzugung der Zustimmung. */
+.cookie-accept, .cookie-decline { min-width:180px; padding:10px 24px; background:var(--purple); color:white; border:none; border-radius:50px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; transition:background 0.2s; font-family:var(--font-body); }
+.cookie-accept:hover, .cookie-decline:hover { background:var(--purple-dark); }
+.cookie-accept:focus-visible, .cookie-decline:focus-visible { outline:2px solid white; outline-offset:2px; }
+@media (max-width:600px) { .cookie-actions { width:100%; } .cookie-actions button { flex:1; min-width:0; } }
 /* Solange das Consent-Banner offen ist, wird der schwebende WhatsApp-Button
    ausgeblendet – sonst überdeckt er auf Mobilgeräten den Zustimmen-Button. */
 body.consent-banner-open .floating-wa { display:none; }
@@ -235,6 +236,12 @@ body.consent-banner-open .floating-wa { display:none; }
 .map-section { padding:0; }
 .map-container { width:100%; line-height:0; }
 .map-container iframe { display:block; width:100%; }
+/* 2-Klick-Lösung: Google Maps wird erst nach Klick geladen. */
+.map-placeholder { min-height:450px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:32px 24px; background:var(--purple-pale); text-align:center; line-height:1.6; }
+.map-placeholder p { max-width:560px; font-size:14px; color:var(--text-mid); }
+.map-placeholder a { color:var(--purple-dark); }
+.map-load-btn { padding:12px 28px; background:var(--purple); color:white; border:none; border-radius:50px; font-size:15px; font-weight:700; cursor:pointer; font-family:var(--font-body); }
+.map-load-btn:hover { background:var(--purple-dark); }
 
 /* ── FORM ROW ── */
 .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
@@ -677,8 +684,8 @@ body.consent-banner-open .floating-wa { display:none; }
 /* ══ FOOTER LINKS GRID ══ */
 .footer-links-grid {
   display: grid;
-  grid-template-columns: repeat(4, auto);
-  grid-template-rows: repeat(2, auto);
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: repeat(3, auto);
   gap: 10px 32px;
   align-items: start;
 }
@@ -690,6 +697,20 @@ body.consent-banner-open .floating-wa { display:none; }
   white-space: nowrap;
 }
 .footer-links-grid a:hover { color: var(--purple-light); }
+.footer-cookie-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.footer-cookie-link:hover { color: var(--purple-light); }
+.footer-cookie-link:focus-visible { outline: 2px solid var(--purple-light); outline-offset: 2px; }
 @media (max-width: 768px) {
   .footer-links-grid {
     grid-template-columns: repeat(2, 1fr);

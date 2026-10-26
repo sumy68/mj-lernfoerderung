@@ -2,7 +2,8 @@
  * MJ Lernförderung – Google Ads Conversion Tracking
  * ---------------------------------------------------------------------------
  * Zweck:
- *   1. Google-Tag (gtag.js) laden – DSGVO-konform mit Consent Mode v2.
+ *   1. Google-Tag (gtag.js) laden – ERST nach Einwilligung (Opt-in).
+ *      Ohne Einwilligung geht kein einziger Request an Google-Server.
  *   2. Consent-Banner (Opt-in) für Marketing-Cookies anzeigen und verwalten.
  *   3. Jede Anfrage als Google-Ads-Conversion melden:
  *        • Klick auf einen tel:-Link          → Conversion "Anruf-Klick"
@@ -59,6 +60,12 @@
 
   /** Link zur Datenschutzerklärung im Consent-Banner. */
   var PRIVACY_URL = '/datenschutz/';
+
+  /** Cookies, die Google Ads auf der eigenen Domain setzt (werden beim Widerruf gelöscht). */
+  var GOOGLE_COOKIE_PATTERN = /^(_gcl_|_gac_)/;
+
+  /** Elemente mit diesem Attribut öffnen die Cookie-Einstellungen (z.B. Footer-Link). */
+  var SETTINGS_TRIGGER_SELECTOR = '[data-cookie-settings]';
 
   /* ═══════════════════════════════════════════════════════════════════════
    * IDEMPOTENZ – bricht ab, falls die Datei bereits einmal ausgeführt wurde
@@ -119,8 +126,9 @@
     window.gtag = gtag;
   }
 
-  // DSGVO: Vor jeder Zustimmung ist ALLES verweigert. Google setzt in diesem
-  // Zustand keine Werbe-Cookies und überträgt keine personenbezogenen Ad-Daten.
+  // Rein lokale Warteschlange: Solange gtag.js nicht geladen ist, landen alle
+  // Befehle nur im dataLayer dieses Tabs – es verlässt nichts den Browser.
+  // Zusätzlich gilt Consent Mode v2: Standard ist ALLES verweigert.
   gtag('consent', 'default', {
     'ad_storage': 'denied',
     'ad_user_data': 'denied',
@@ -129,18 +137,28 @@
     'wait_for_update': 500
   });
 
-  // Früher erteilte Zustimmung sofort wiederherstellen – noch bevor gtag.js lädt,
-  // damit innerhalb des wait_for_update-Fensters bereits der korrekte Status steht.
+  /** true, sobald gtag.js in diesem Seitenaufruf aktiviert wurde. */
+  var googleTagActive = false;
+
+  // Früher erteilte Zustimmung wiederherstellen und NUR DANN gtag.js laden.
+  // Ohne gespeichertes 'granted' wird gtag.js erst in grantMarketingConsent() geladen.
   var storedConsent = readStoredConsent();
   if (storedConsent === 'granted') {
     pushConsentUpdate('granted');
+    activateGoogleTag();
   }
 
-  gtag('js', new Date());
-  gtag('config', ADS_ID);
-
-  // gtag.js nachladen – nur, wenn das Tag nicht bereits im Dokument steht.
-  loadGtagScript();
+  /**
+   * Konfiguriert das Google-Tag und lädt gtag.js – darf nur mit Einwilligung
+   * aufgerufen werden. Mehrfachaufrufe sind wirkungslos.
+   */
+  function activateGoogleTag() {
+    if (googleTagActive) return;
+    googleTagActive = true;
+    gtag('js', new Date());
+    gtag('config', ADS_ID);
+    loadGtagScript();
+  }
 
   /**
    * Bindet die gtag.js-Bibliothek asynchron ein (nur einmal pro Seite).
@@ -194,17 +212,56 @@
   function grantMarketingConsent() {
     storeConsent('granted');
     pushConsentUpdate('granted');
+    activateGoogleTag();
     hideBanner();
   }
 
   /**
    * Zustimmung ablehnen bzw. widerrufen (Art. 7 Abs. 3 DSGVO).
    * ÖFFENTLICHE API: window.denyMarketingConsent();
+   *
+   * Bei einem Widerruf (gtag.js lief bereits in diesem Tab) werden die
+   * Google-Cookies gelöscht und die Seite neu geladen, damit gtag.js
+   * vollständig aus dem Speicher verschwindet.
    */
   function denyMarketingConsent() {
     storeConsent('denied');
     pushConsentUpdate('denied');
+    deleteGoogleCookies();
     hideBanner();
+    if (googleTagActive) {
+      log('Widerruf – Seite wird neu geladen, um gtag.js zu entfernen');
+      window.location.reload();
+    }
+  }
+
+  /**
+   * Liefert alle Domains, unter denen ein Cookie für diesen Host gesetzt sein
+   * kann (z.B. www.example.de → www.example.de, example.de).
+   * @returns {string[]}
+   */
+  function cookieDomainCandidates() {
+    var parts = window.location.hostname.split('.');
+    var domains = [];
+    for (var i = 0; i < parts.length - 1; i++) {
+      domains.push(parts.slice(i).join('.'));
+    }
+    return domains;
+  }
+
+  /** Löscht _gcl_*- und _gac_*-Cookies der eigenen Domain. */
+  function deleteGoogleCookies() {
+    var expired = '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+    var domains = cookieDomainCandidates();
+    document.cookie.split(';').forEach(function (entry) {
+      var name = entry.split('=')[0].trim();
+      if (!GOOGLE_COOKIE_PATTERN.test(name)) return;
+      document.cookie = name + expired;
+      domains.forEach(function (domain) {
+        document.cookie = name + expired + '; domain=.' + domain;
+      });
+      log('Cookie gelöscht:', name);
+    });
   }
 
   /**
@@ -226,10 +283,12 @@
   /**
    * Baut das Banner und zeigt es an, solange noch keine Entscheidung vorliegt.
    * Nutzt die bestehenden CSS-Klassen aus style.css.
+   * @param {boolean} [force] true = auch bei bestehender Entscheidung anzeigen
+   *                          (Aufruf über "Cookie-Einstellungen").
    */
-  function renderBanner() {
+  function renderBanner(force) {
     if (!SHOW_BUILTIN_BANNER) return;
-    if (readStoredConsent() !== null) return;      // Entscheidung liegt bereits vor
+    if (!force && readStoredConsent() !== null) return; // Entscheidung liegt bereits vor
     if (document.getElementById('cookie-banner')) return; // schon vorhanden
 
     var banner = document.createElement('div');
@@ -245,7 +304,8 @@
     text.innerHTML =
       '🍪 Wir verwenden technisch notwendige Cookies sowie – nur mit Ihrer ' +
       'Einwilligung – Cookies von Google Ads, um die Wirksamkeit unserer ' +
-      'Werbeanzeigen zu messen. Sie können Ihre Auswahl jederzeit ändern. ' +
+      'Werbeanzeigen zu messen. Ihre Auswahl können Sie jederzeit über ' +
+      '„Cookie-Einstellungen“ unten auf der Seite ändern. ' +
       'Mehr dazu in unserer <a href="' + PRIVACY_URL + '">Datenschutzerklärung</a>.';
 
     var actions = document.createElement('div');
@@ -277,6 +337,8 @@
     document.body.classList.add('consent-banner-open');
 
     bannerEl = banner;
+    // Bei bewusstem Öffnen (Footer-Link) Tastaturfokus ins Banner setzen.
+    if (force) declineBtn.focus();
     log('Consent-Banner angezeigt');
   }
 
@@ -288,20 +350,31 @@
 
   /**
    * Blendet das Banner erneut ein, damit die Entscheidung geändert werden kann.
+   * Die bisherige Entscheidung bleibt gültig, bis eine neue getroffen wird –
+   * nur so lässt sich ein Wechsel granted → denied als Widerruf erkennen.
    * ÖFFENTLICHE API (z.B. für einen Link "Cookie-Einstellungen" im Footer):
    *     window.mjTracking.showConsentBanner();
    */
   function showConsentBanner() {
-    try {
-      window.localStorage.removeItem(CONSENT_KEY);
-    } catch (e) {
-      log('localStorage nicht löschbar:', e && e.message);
-    }
     var existing = document.getElementById('cookie-banner');
     if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
     bannerEl = null;
-    renderBanner();
+    renderBanner(true);
   }
+
+  /**
+   * Delegierter Listener für alle "Cookie-Einstellungen"-Auslöser – greift
+   * auch beim Footer, der erst nachträglich per Partial ins DOM kommt.
+   */
+  function handleSettingsClick(event) {
+    var target = event.target;
+    if (!target || typeof target.closest !== 'function') return;
+    if (!target.closest(SETTINGS_TRIGGER_SELECTOR)) return;
+    event.preventDefault();
+    showConsentBanner();
+  }
+
+  document.addEventListener('click', handleSettingsClick);
 
   /* ═══════════════════════════════════════════════════════════════════════
    * 4) CONVERSION-TRACKING FÜR ANFRAGEN (Anruf, WhatsApp, Formular)
