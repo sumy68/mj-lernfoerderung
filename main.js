@@ -40,6 +40,29 @@ async function init() {
   const form = document.getElementById('kontakt-form');
   const success = document.getElementById('form-success');
 
+  // Förderschwerpunkt wie in der MJ-Plattform: Fach-Feld nur bei
+  // "Fachlicher Schwerpunkt" sichtbar und Pflicht, sonst disabled (wird nicht gesendet).
+  const fachToggle = form && form.querySelector('[data-fach-toggle]');
+  const fachInput = form && form.querySelector('.fach-input');
+  function syncFach() {
+    if (!fachToggle || !fachInput) return;
+    fachInput.hidden = !fachToggle.checked;
+    fachInput.disabled = !fachToggle.checked;
+  }
+  if (fachToggle) fachToggle.addEventListener('change', syncFach);
+
+  // Mehrfachauswahl als ein kommagetrenntes Feld an Formspree
+  function buildFormData() {
+    const data = new FormData(form);
+    const schwerpunkte = data.getAll('foerderschwerpunkt');
+    data.delete('foerderschwerpunkt');
+    if (schwerpunkte.length) data.set('foerderschwerpunkt', schwerpunkte.join(', '));
+    if (data.has('foerderschwerpunkt_fach')) {
+      data.set('foerderschwerpunkt_fach', data.get('foerderschwerpunkt_fach').trim());
+    }
+    return data;
+  }
+
   if (form) {
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -49,7 +72,7 @@ async function init() {
       try {
         const res = await fetch(form.action, {
           method: 'POST',
-          body: new FormData(form),
+          body: buildFormData(),
           headers: { 'Accept': 'application/json' }
         });
         if (res.ok) {
@@ -58,6 +81,7 @@ async function init() {
             window.mjTracking.formLead();
           }
           form.reset();
+          syncFach();
           if (success) success.style.display = 'block';
           btn.style.display = 'none';
         } else {

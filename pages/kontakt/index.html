@@ -119,19 +119,22 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Förderbedarf (optional)</label>
+          <label>Förderschwerpunkt (optional)</label>
           <div class="checkbox-group">
-            <label class="checkbox-label"><input type="checkbox" name="foerderbedarf" value="LRS"/> LRS</label>
-            <label class="checkbox-label"><input type="checkbox" name="foerderbedarf" value="Dyskalkulie"/> Dyskalkulie</label>
-            <label class="checkbox-label"><input type="checkbox" name="foerderbedarf" value="ADHS"/> ADHS</label>
-            <label class="checkbox-label"><input type="checkbox" name="foerderbedarf" value="Autismus-Spektrum"/> Autismus-Spektrum</label>
-            <label class="checkbox-label"><input type="checkbox" name="foerderbedarf" value="Lernblockaden"/> Lernblockaden</label>
-            <label class="checkbox-label"><input type="checkbox" name="foerderbedarf" value="Sonstiges"/> Sonstiges</label>
+            <label class="checkbox-label"><input type="checkbox" name="foerderschwerpunkt" value="Lesen"/> Lesen</label>
+            <label class="checkbox-label"><input type="checkbox" name="foerderschwerpunkt" value="Rechtschreibung"/> Rechtschreibung</label>
+            <label class="checkbox-label"><input type="checkbox" name="foerderschwerpunkt" value="Rechnen / Mathe-Grundlagen"/> Rechnen / Mathe-Grundlagen</label>
+            <label class="checkbox-label"><input type="checkbox" name="foerderschwerpunkt" value="Deutsch als Zweitsprache"/> Deutsch als Zweitsprache</label>
+            <label class="checkbox-label"><input type="checkbox" name="foerderschwerpunkt" value="Lernorganisation und Konzentration"/> Lernorganisation und Konzentration</label>
+            <label class="checkbox-label"><input type="checkbox" name="foerderschwerpunkt" value="Fachlicher Schwerpunkt" data-fach-toggle/> Fachlicher Schwerpunkt</label>
           </div>
+          <!-- Wie MJ-Plattform: Fach nur bei "Fachlicher Schwerpunkt", dann Pflicht, max. 50 Zeichen -->
+          <input type="text" name="foerderschwerpunkt_fach" class="fach-input" maxlength="50" pattern=".*\S.*" placeholder="Fach, z. B. Englisch" aria-label="Fach" required hidden disabled/>
         </div>
         <div class="form-group">
           <label>Nachricht</label>
-          <textarea name="message" rows="4" placeholder="Weitere Hinweise, z.B. LRS, ADHS, Sprache..."></textarea>
+          <textarea name="message" rows="4" placeholder="Weitere Hinweise, z.B. Fach, Ziele, Wunschzeiten..."></textarea>
+          <p class="form-hint">Bitte keine Diagnosen oder Gesundheitsangaben eintragen.</p>
         </div>
         <button type="submit" class="cta-btn large" style="width:100%;justify-content:center;">Anfrage absenden</button>
         <p class="form-success" id="form-success">✅ Danke! Wir melden uns bald bei Ihnen.</p>

@@ -163,9 +163,10 @@ section { padding:80px 24px; }
 
 /* ── CHECKBOX GROUP ── */
 .checkbox-group { display:flex; flex-wrap:wrap; gap:10px; margin-top:6px; }
+.form-hint { margin-top:8px; font-size:13px; color:var(--text-mid); }
 .checkbox-label { display:flex; align-items:center; gap:6px; font-size:14px; color:var(--text-mid); font-weight:600; cursor:pointer; padding:7px 14px; background:var(--purple-pale); border-radius:50px; border:2px solid transparent; transition:all 0.2s; }
 .checkbox-label:hover { border-color:var(--purple-light); }
-.checkbox-label input[type="checkbox"] { accent-color:var(--purple); width:15px; height:15px; }
+.checkbox-label input[type="checkbox"] { accent-color:var(--purple); width:15px; height:15px; flex-shrink:0; }
 .checkbox-label:has(input:checked) { background:var(--purple-light); border-color:var(--purple); color:var(--purple-dark); }
 
 /* ── HERO SLOGAN ── */
